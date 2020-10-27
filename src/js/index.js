@@ -5,22 +5,36 @@ import WebcamEasy from 'webcam-easy';
 import * as tf from "@tensorflow/tfjs";
 import * as facemesh from "@tensorflow-models/face-landmarks-detection";
 
+// utils import
+import { btnDisabledHandler, makeClearCanvas } from './utils.js';
+
 // Functional elements
 const webcamElement = document.querySelector('#webcam');
 const canvasElement = document.querySelector('#canvas');
-const snapSoundElement = document.querySelector('#snapSound');
+const clear = makeClearCanvas(canvasElement);
 
 // User interaction elements
 const btnStart = document.querySelector('.button.start');
 const btnStream = document.querySelector('.button.stream');
+const btnSnap = document.querySelector('.button.snap');
 const btnFacemesh = document.querySelector('.button.facemesh');
 const btnStop = document.querySelector('.button.stop');
 
 // WebcamEasy instance
-const webcam = new WebcamEasy(webcamElement, 'user', canvasElement, snapSoundElement);
+const webcam = new WebcamEasy(webcamElement, 'user', canvasElement);
 
 // Update interval for facemesh
-const interval = null;
+let interval = null;
+
+// Webcam states
+const webcamStates = {
+    ON: true,
+    PAUSED: 'paused',
+    OFF: false
+};
+
+// Webcam state
+let webcamState = false;
 
 // Load facemesh
 const runFacemesh = async () => {
@@ -38,7 +52,6 @@ const predictions = async (model) => {
         webcamElement !== null &&
         webcamElement.readyState === 4
     ) {
-        // requestAnimationFrame(() => predictions(model));
         // Get video properties
         const video = webcamElement;
         const videoWidth = webcamElement.width;
@@ -64,7 +77,7 @@ const predictions = async (model) => {
                 // Log facial keypoints.
                 for (let i = 0; i < keypoints.length; i++) {
                     const [x, y, z] = keypoints[i];
-                    console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+                    // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
                 }
             }
         }
@@ -74,25 +87,39 @@ const predictions = async (model) => {
 // get permision from user, get all video inputs, start stream
 btnStart.addEventListener('click', () => {
     webcam.start()
-    .then(() => console.log("webcam started"))
+    .then(() => {
+        webcamState = webcamStates.ON;
+        btnDisabledHandler(webcamState, [btnSnap, btnStop, btnFacemesh], [btnStream]);
+        clear();
+    })
     .catch(err => console.log(err));
 });
 
-// start stream to video element
+// continue stream, clear canvas from image
 btnStream.addEventListener('click', () => {
-    webcam.stream()
-    .then(() => console.log('stream started'))
-    .catch(err => console.log(err));
+    webcam.stream();
+    btnDisabledHandler(false, [btnStream], [btnSnap]);
+    clear();
+});
+
+// take snap from video, render image on canvas
+btnSnap.addEventListener('click', () => {
+    const picture = webcam.snap();
+    webcamState = webcamStates.PAUSED;
+    btnDisabledHandler(false, [btnSnap], [btnStream]);
 });
 
 // Stop streaming
 btnStop.addEventListener('click', () => {
-    webcam.stop();
     if (interval) clearInterval(interval);
+    webcam.stop();
+    webcamState = webcamStates.OFF;
+    btnDisabledHandler(webcamState, [btnSnap, btnStop, btnFacemesh, btnStream]);
 });
 
 // start facemesh detection
 btnFacemesh.addEventListener('click', () => {
-    runFacemesh()
+    clear();
+    if (webcamState) runFacemesh();
 });
 
