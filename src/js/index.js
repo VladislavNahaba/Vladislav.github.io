@@ -21,9 +21,15 @@ const btnStream = document.querySelector('.button.stream');
 const btnSnap = document.querySelector('.button.snap');
 const btnFacemesh = document.querySelector('.button.facemesh');
 const btnStop = document.querySelector('.button.stop');
+const btnFlip = document.querySelector('.button.flip');
 
 // WebcamEasy instance
 const webcam = new WebcamEasy(webcamElement, 'user', canvasElement);
+
+// Flip available check
+if (webcam.webcamCount > 1) {
+    btnFlip.style.display = 'block';
+}
 
 // Update interval for facemesh
 let interval = null;
@@ -99,6 +105,12 @@ btnSnap.addEventListener('click', () => {
     const picture = webcam.snap();
     webcamState = webcamStates.PAUSED;
     btnDisabledHandler(false, [btnSnap], [btnStream]);
+});
+
+// Stop streaming
+btnFlip.addEventListener('click', () => {
+    clear(ctx);
+    webcam.flip();
 });
 
 // Stop streaming

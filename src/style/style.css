@@ -88,6 +88,10 @@ body {
 .stop {
     background: #f44336;
 }
+.flip {
+    display: none;
+    background: #ff9800;
+}
 
 @media only screen and (max-width: 640px) {
     .controllers {
