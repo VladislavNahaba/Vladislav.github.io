@@ -70,8 +70,8 @@ const predictions = async (model) => {
         const predictions = await model.estimateFaces({
             input: video
         });
-        console.log(predictions);
 
+        // draw triangulation
         drawMesh(predictions, ctx);
     }
 };
