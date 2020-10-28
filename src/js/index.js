@@ -6,12 +6,14 @@ import * as tf from "@tensorflow/tfjs";
 import * as facemesh from "@tensorflow-models/face-landmarks-detection";
 
 // utils import
-import { btnDisabledHandler, makeClearCanvas } from './utils.js';
+import { btnDisabledHandler, clear, drawMesh } from './utils.js';
 
 // Functional elements
 const webcamElement = document.querySelector('#webcam');
 const canvasElement = document.querySelector('#canvas');
-const clear = makeClearCanvas(canvasElement);
+
+// Get context
+const ctx = canvas.getContext('2d');
 
 // User interaction elements
 const btnStart = document.querySelector('.button.start');
@@ -66,43 +68,33 @@ const predictions = async (model) => {
         canvasElement.height = videoHeight;
 
         const predictions = await model.estimateFaces({
-            input: webcamElement
+            input: video,
+            flipHorizontal: true,
         });
 
-        console.log(predictions);
-
-        if (predictions.length > 0) {
-            for (let i = 0; i < predictions.length; i++) {
-                const keypoints = predictions[i].scaledMesh;
-                // Log facial keypoints.
-                for (let i = 0; i < keypoints.length; i++) {
-                    const [x, y, z] = keypoints[i];
-                    // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-                }
-            }
-        }
+        drawMesh(predictions, ctx);
     }
 };
 
-// get permision from user, get all video inputs, start stream
+// get permision from user, get all video inputs, start stream; disable btns; clear canvas
 btnStart.addEventListener('click', () => {
     webcam.start()
     .then(() => {
         webcamState = webcamStates.ON;
         btnDisabledHandler(webcamState, [btnSnap, btnStop, btnFacemesh], [btnStream]);
-        clear();
+        clear(ctx);
     })
     .catch(err => console.log(err));
 });
 
-// continue stream, clear canvas from image
+// continue stream; clear canvas from image
 btnStream.addEventListener('click', () => {
     webcam.stream();
     btnDisabledHandler(false, [btnStream], [btnSnap]);
-    clear();
+    clear(ctx);
 });
 
-// take snap from video, render image on canvas
+// take snap from video; render image on canvas
 btnSnap.addEventListener('click', () => {
     const picture = webcam.snap();
     webcamState = webcamStates.PAUSED;
@@ -119,7 +111,7 @@ btnStop.addEventListener('click', () => {
 
 // start facemesh detection
 btnFacemesh.addEventListener('click', () => {
-    clear();
+    clear(ctx);
     if (webcamState) runFacemesh();
 });
 
