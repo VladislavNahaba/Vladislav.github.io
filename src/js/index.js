@@ -68,9 +68,9 @@ const predictions = async (model) => {
         canvasElement.height = videoHeight;
 
         const predictions = await model.estimateFaces({
-            input: video,
-            flipHorizontal: true,
+            input: video
         });
+        console.log(predictions);
 
         drawMesh(predictions, ctx);
     }

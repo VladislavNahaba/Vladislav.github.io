@@ -1,3 +1,4 @@
+// Enable/Disable btns
 export const btnDisabledHandler = (state, btns, reversStateBtns = []) => {
     if (Array.isArray(btns)) {
         btns.forEach(btn => {
@@ -11,6 +12,7 @@ export const btnDisabledHandler = (state, btns, reversStateBtns = []) => {
     }
 };
 
+// Clear canvas
 export const clear = (ctx) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
