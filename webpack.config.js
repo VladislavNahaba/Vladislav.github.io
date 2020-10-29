@@ -70,9 +70,10 @@ module.exports = {
         port: 9000,
         https: !isDev,
         hot: isDev,
+        host: '0.0.0.0',
         onListening: server => {
             const port = server.listeningApp.address().port;
-            console.log('Listening on port:', port);
+            console.log('Listening on port: ', port);
         },
         open: true
     },

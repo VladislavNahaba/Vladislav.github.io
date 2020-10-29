@@ -7,7 +7,8 @@
     "dev": "cross-env NODE_ENV=development webpack --mode development",
     "build": "cross-env NODE_ENV=production webpack --mode production",
     "watch": "cross-env NODE_ENV=development webpack --mode development --watch",
-    "start": "cross-env NODE_ENV=development webpack serve --mode development"
+    "start": "cross-env NODE_ENV=development webpack serve --mode development",
+    "serve": "http-server ./dist"
   },
   "repository": {
     "type": "git",
@@ -52,6 +53,7 @@
     "@tensorflow-models/face-landmarks-detection": "0.0.1",
     "@tensorflow/tfjs": "^2.7.0",
     "express": "^4.17.1",
+    "http-server": "^0.12.3",
     "webcam-easy": "^1.0.5",
     "webpack-dev-server": "^3.11.0"
   }
